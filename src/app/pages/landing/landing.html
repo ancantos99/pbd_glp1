@@ -1,0 +1,106 @@
+<nav class="navbar">
+  <div class="nav-inner">
+    <span class="nav-logo">GLP-1</span>
+    <button class="btn btn-primary btn-sm" (click)="goToIntake()">¿Estoy Calificado?</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-pill">
+        <span class="hero-pill-dot"></span>
+        Avalado por médicos certificados
+      </div>
+      <h1 class="hero-title">El tratamiento médico para perder peso que funciona</h1>
+      <p class="hero-subtitle">GLP-1 prescrito por médicos licenciados. Evaluación en línea, entrega discreta a tu domicilio.</p>
+
+      <div class="hero-checks">
+        <div class="hero-check">
+          <span class="check-icon">✓</span>
+          Evaluación médica gratuita
+        </div>
+        <div class="hero-check">
+          <span class="check-icon">✓</span>
+          Prescripción en 24 horas
+        </div>
+        <div class="hero-check">
+          <span class="check-icon">✓</span>
+          Envío discreto a domicilio
+        </div>
+        <div class="hero-check">
+          <span class="check-icon">✓</span>
+          Seguimiento médico continuo
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg" (click)="goToIntake()">¿Estoy Calificado?</button>
+      <span class="cta-note">Consulta gratuita · Sin compromiso · Sin tarjeta de crédito</span>
+    </div>
+
+    <div class="hero-visual">
+      <img src="assets/img/glp.png" alt="Medicamento GLP-1" class="hero-img" />
+    </div>
+  </div>
+</section>
+
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-stat">
+      <span class="trust-value">+10K</span>
+      <span class="trust-label">Pacientes atendidos</span>
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-stat">
+      <span class="trust-value">FDA</span>
+      <span class="trust-label">Medicamento aprobado</span>
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-stat">
+      <span class="trust-value">24h</span>
+      <span class="trust-label">Respuesta médica</span>
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-stat">
+      <span class="trust-value">100%</span>
+      <span class="trust-label">Médicos licenciados</span>
+    </div>
+  </div>
+</div>
+
+<section class="steps">
+  <div class="steps-inner">
+    <div class="steps-header">
+      <p class="steps-eyebrow">El proceso</p>
+      <h2 class="steps-title">Así de simple</h2>
+    </div>
+    <div class="steps-grid">
+      @for (step of steps; track step.title; let i = $index) {
+        <div class="step">
+          <div class="step-num">{{ i + 1 }}</div>
+          <h3 class="step-title">{{ step.title }}</h3>
+          <p class="step-desc">{{ step.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="cta-section" id="calificacion">
+  <div class="cta-inner">
+    <h2 class="cta-title">¿Eres candidato para GLP-1?</h2>
+    <p class="cta-subtitle">Descúbrelo en minutos con nuestra evaluación médica gratuita</p>
+    <button class="btn btn-primary btn-lg" (click)="goToIntake()">¿Estoy Calificado?</button>
+    <span class="cta-note-sm">Sin tarjeta de crédito · Sin compromiso</span>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="footer-brand">GLP-1</span>
+    <p class="footer-legal">
+      &copy; 2026 GLP-1 Pro. Atención médica licenciada, en línea.<br>
+      Este servicio no reemplaza la atención médica de emergencia.
+    </p>
+  </div>
+</footer>

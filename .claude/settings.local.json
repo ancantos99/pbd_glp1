@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"c:/Desarrollo/Netvoice/WorkspaceFarma/farma-app/src/app/pages/intake\")",
+      "Bash(npx tsc *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Desarrollo\\Netvoice\\WorkspaceFarma\\farma-app\\src\\app\\pages"
+    ]
+  }
+}

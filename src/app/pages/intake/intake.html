@@ -1,0 +1,325 @@
+<!-- SUCCESS STATE -->
+@if (submitted()) {
+  <div class="success-screen">
+    <div class="success-card">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h1 class="success-title">¡Solicitud Enviada!</h1>
+      <p class="success-sub">Un médico certificado revisará tu evaluación en las próximas 24 horas. Recibirás un correo con los siguientes pasos.</p>
+      <div class="success-info">
+        <span class="success-name">{{ formData.nombre }} {{ formData.apellido }}</span>
+      </div>
+      <button class="btn-back-home" (click)="goToLanding()">Volver al inicio</button>
+    </div>
+  </div>
+}
+
+<!-- FORM -->
+@if (!submitted()) {
+<div class="intake-wrapper">
+
+  <!-- Header -->
+  <header class="intake-header">
+    <button class="back-btn" (click)="goToLanding()" aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <span class="header-brand">GLP-1</span>
+    <span class="step-counter">{{ currentStep() }} / {{ totalSteps }}</span>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="progress-track">
+    <div class="progress-fill" [style.width.%]="progress()"></div>
+  </div>
+
+  <!-- Step Label -->
+  <div class="step-label">
+    <span class="step-name">{{ stepTitles[currentStep() - 1] }}</span>
+  </div>
+
+  <!-- FORM CONTENT -->
+  <main class="form-main" [class.animating]="animating()">
+
+    <!-- STEP 1: Datos Personales -->
+    @if (currentStep() === 1) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Cuéntanos sobre ti</h2>
+        <p class="step-desc">Necesitamos tus datos básicos para comenzar la evaluación médica.</p>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label" for="nombre">Nombre</label>
+          <input id="nombre" class="field-input" type="text" placeholder="Ej: María" [(ngModel)]="formData.nombre" autocomplete="given-name"/>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="apellido">Apellido</label>
+          <input id="apellido" class="field-input" type="text" placeholder="Ej: García" [(ngModel)]="formData.apellido" autocomplete="family-name"/>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="email">Correo electrónico</label>
+        <input id="email" class="field-input" type="email" placeholder="Ej: maria@ejemplo.com" [(ngModel)]="formData.email" autocomplete="email"/>
+        @if (formData.email && !isValidEmail(formData.email)) {
+          <span class="field-error">Ingresa un correo electrónico válido.</span>
+        }
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="fechaNac">Fecha de nacimiento</label>
+        <input id="fechaNac" class="field-input" type="date" [(ngModel)]="formData.fechaNacimiento"/>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">¿Cuál es tu sexo biológico al nacer?</label>
+        <div class="card-grid cols-2">
+          <button class="sel-card" [class.selected]="formData.sexo === 'masculino'" (click)="formData.sexo = 'masculino'" type="button">
+            <span class="sel-icon">♂</span>
+            <span class="sel-label">Hombre</span>
+          </button>
+          <button class="sel-card" [class.selected]="formData.sexo === 'femenino'" (click)="formData.sexo = 'femenino'" type="button">
+            <span class="sel-icon">♀</span>
+            <span class="sel-label">Mujer</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- STEP 2: Métricas Físicas -->
+    @if (currentStep() === 2) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Tus medidas físicas</h2>
+        <p class="step-desc">Esta información es necesaria para calcular tu IMC y determinar elegibilidad.</p>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Estatura</label>
+        <div class="unit-toggle">
+          <button class="unit-btn" [class.active]="formData.unidadEstatura === 'imperial'" (click)="formData.unidadEstatura = 'imperial'" type="button">Pies / Pulgadas</button>
+          <button class="unit-btn" [class.active]="formData.unidadEstatura === 'metric'" (click)="formData.unidadEstatura = 'metric'" type="button">Centímetros</button>
+        </div>
+        @if (formData.unidadEstatura === 'imperial') {
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label-sm" for="pies">Pies</label>
+              <input id="pies" class="field-input" type="number" min="3" max="8" placeholder="5" [(ngModel)]="formData.estaturaPies"/>
+            </div>
+            <div class="input-group">
+              <label class="input-label-sm" for="pulgadas">Pulgadas</label>
+              <input id="pulgadas" class="field-input" type="number" min="0" max="11" placeholder="7" [(ngModel)]="formData.estaturaPulgadas"/>
+            </div>
+          </div>
+        }
+        @if (formData.unidadEstatura === 'metric') {
+          <input class="field-input" type="number" min="100" max="250" placeholder="170" [(ngModel)]="formData.estaturaCm"/>
+          <span class="field-unit">cm</span>
+        }
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Peso actual</label>
+        <div class="unit-toggle">
+          <button class="unit-btn" [class.active]="formData.unidadPeso === 'lb'" (click)="formData.unidadPeso = 'lb'" type="button">Libras</button>
+          <button class="unit-btn" [class.active]="formData.unidadPeso === 'kg'" (click)="formData.unidadPeso = 'kg'" type="button">Kilogramos</button>
+        </div>
+        <div class="weight-input-wrap">
+          <input class="field-input" type="number" min="50" placeholder="{{ formData.unidadPeso === 'lb' ? '180' : '82' }}" [(ngModel)]="formData.peso"/>
+          <span class="field-unit-inline">{{ formData.unidadPeso }}</span>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- STEP 3: Historia de Peso -->
+    @if (currentStep() === 3) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Historia de peso</h2>
+        <p class="step-desc">Selecciona todas las que apliquen a tu situación actual.</p>
+      </div>
+
+      <div class="card-grid cols-1">
+        @for (op of historiasPesoOpciones; track op.value) {
+          <button class="sel-card text-card" [class.selected]="isHistoriaSelected(op.value)" (click)="toggleHistoriaPeso(op.value)" type="button">
+            <span class="check-box" [class.checked]="isHistoriaSelected(op.value)">
+              @if (isHistoriaSelected(op.value)) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              }
+            </span>
+            <span class="sel-text">{{ op.label }}</span>
+          </button>
+        }
+      </div>
+    </section>
+    }
+
+    <!-- STEP 4: Historial Médico -->
+    @if (currentStep() === 4) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Historial médico</h2>
+        <p class="step-desc">Selecciona todas las condiciones que apliquen. Esta información es confidencial.</p>
+      </div>
+
+      <div class="conditions-list">
+        @for (cond of condicionesMedicasOpciones; track cond.value) {
+          <button class="condition-item" [class.selected]="isCondicionSelected(cond.value)" (click)="toggleCondicion(cond.value)" type="button">
+            <span class="cond-check" [class.checked]="isCondicionSelected(cond.value)">
+              @if (isCondicionSelected(cond.value)) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              }
+            </span>
+            <span class="cond-label">{{ cond.label }}</span>
+          </button>
+        }
+      </div>
+    </section>
+    }
+
+    <!-- STEP 5: Seguridad -->
+    @if (currentStep() === 5) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Preguntas de seguridad</h2>
+        <p class="step-desc">Estas preguntas nos ayudan a garantizar que el tratamiento sea seguro para ti.</p>
+      </div>
+
+      <div class="safety-question">
+        <p class="safety-q">¿Tiene antecedentes familiares de Cáncer Medular de Tiroides?</p>
+        <div class="card-grid cols-2">
+          <button class="sel-card yn-card" [class.selected]="formData.antecedentesTimoide === 'si'" (click)="formData.antecedentesTimoide = 'si'" type="button">
+            <span class="yn-icon yes">✓</span>
+            <span class="sel-label">Sí</span>
+          </button>
+          <button class="sel-card yn-card" [class.selected]="formData.antecedentesTimoide === 'no'" (click)="formData.antecedentesTimoide = 'no'" type="button">
+            <span class="yn-icon no">✗</span>
+            <span class="sel-label">No</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="safety-question">
+        <p class="safety-q">¿Está actualmente embarazada o planea estarlo en los próximos 3 meses?</p>
+        <div class="card-grid cols-2">
+          <button class="sel-card yn-card" [class.selected]="formData.embarazada === 'si'" (click)="formData.embarazada = 'si'" type="button">
+            <span class="yn-icon yes">✓</span>
+            <span class="sel-label">Sí</span>
+          </button>
+          <button class="sel-card yn-card" [class.selected]="formData.embarazada === 'no'" (click)="formData.embarazada = 'no'" type="button">
+            <span class="yn-icon no">✗</span>
+            <span class="sel-label">No</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="safety-question">
+        <p class="safety-q">¿Tiene problemas activos de abuso de sustancias?</p>
+        <div class="card-grid cols-2">
+          <button class="sel-card yn-card" [class.selected]="formData.abusanSustancias === 'si'" (click)="formData.abusanSustancias = 'si'" type="button">
+            <span class="yn-icon yes">✓</span>
+            <span class="sel-label">Sí</span>
+          </button>
+          <button class="sel-card yn-card" [class.selected]="formData.abusanSustancias === 'no'" (click)="formData.abusanSustancias = 'no'" type="button">
+            <span class="yn-icon no">✗</span>
+            <span class="sel-label">No</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- STEP 6: Alergias y Medicamentos -->
+    @if (currentStep() === 6) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Alergias y medicamentos</h2>
+        <p class="step-desc">Esta información ayuda al médico a personalizar tu tratamiento de forma segura.</p>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="alergias">Alergias a medicamentos</label>
+        <textarea id="alergias" class="field-textarea" placeholder="Ej: Penicilina, Sulfa, o ninguna..." [(ngModel)]="formData.alergias" rows="3"></textarea>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">¿Está tomando actualmente algún medicamento para la presión arterial o la diabetes?</label>
+        <div class="card-grid cols-2">
+          <button class="sel-card yn-card" [class.selected]="formData.medicamentosPresion === 'si'" (click)="formData.medicamentosPresion = 'si'" type="button">
+            <span class="yn-icon yes">✓</span>
+            <span class="sel-label">Sí</span>
+          </button>
+          <button class="sel-card yn-card" [class.selected]="formData.medicamentosPresion === 'no'" (click)="formData.medicamentosPresion = 'no'" type="button">
+            <span class="yn-icon no">✗</span>
+            <span class="sel-label">No</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- STEP 7: Motivación -->
+    @if (currentStep() === 7) {
+    <section class="form-step">
+      <div class="step-header">
+        <h2 class="step-title">Tu nivel de motivación</h2>
+        <p class="step-desc">¿Con qué urgencia describes tu deseo de cambiar?</p>
+      </div>
+
+      <div class="motivation-grid">
+        @for (mot of motivaciones; track mot.value) {
+          <button class="mot-card" [class.selected]="formData.nivelMotivacion === mot.value" (click)="formData.nivelMotivacion = mot.value" [style.--mot-color]="mot.color" type="button">
+            <span class="mot-emoji">{{ mot.emoji }}</span>
+            <div class="mot-content">
+              <span class="mot-nivel">{{ mot.nivel }}</span>
+              <span class="mot-label">{{ mot.label }}</span>
+            </div>
+            <span class="mot-check" [class.visible]="formData.nivelMotivacion === mot.value">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+    }
+
+  </main>
+
+  <!-- Navigation -->
+  <div class="nav-footer">
+    @if (currentStep() > 1) {
+      <button class="btn-prev" (click)="goBack()" type="button">← Anterior</button>
+    } @else {
+      <span></span>
+    }
+
+    @if (currentStep() < totalSteps) {
+      <button class="btn-next" (click)="goNext()" [disabled]="!isStepValid()" type="button">
+        Siguiente →
+      </button>
+    } @else {
+      <div class="submit-wrap">
+        @if (sendError()) {
+          <p class="send-error">{{ sendError() }}</p>
+        }
+        <button class="btn-submit" (click)="submit()" [disabled]="!isStepValid() || sending()" type="button">
+          @if (sending()) {
+            <span class="spinner"></span> Enviando...
+          } @else {
+            Enviar Evaluación
+          }
+        </button>
+      </div>
+    }
+  </div>
+
+</div>
+}
